@@ -3,6 +3,7 @@ import axios from 'axios';
 import cs from 'classnames';
 import styles from './App.module.css';
 import styled from 'styled-components';
+import { ReactComponent as Check } from './check.svg';
 
 const StyledContainer = styled.div`
   height: 100vw;
@@ -46,6 +47,10 @@ const StyledButton = styled.button`
   &:hover {
     background: #171212;
     color: #ffffff;
+  }
+  &:hover > svg > g {
+    fill: #ffffff;
+    stroke: #ffffff;
   }
 `;
 
@@ -192,6 +197,9 @@ const App = () => {
         )}
 
         {/*list.map((item) => <div key={item.objectID}>{item.title}</div>)*/}
+        <div>
+          Icons made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a>
+        </div>
       </StyledContainer>
   );
 };
@@ -256,7 +264,7 @@ const Item = ({ item, onRemoveItem }) => (
         type="button"
         onClick={() => onRemoveItem(item)}
       >
-        Dismiss
+        <Check height="18px" width="18px" />
       </StyledButtonSmall>
     </StyledColumn>
   </StyledItem>
