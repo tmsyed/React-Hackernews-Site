@@ -1,7 +1,5 @@
 import React from 'react';
 import axios from 'axios';
-import cs from 'classnames';
-import styles from './App.module.css';
 import styled from 'styled-components';
 import { ReactComponent as Check } from './check.svg';
 
@@ -117,18 +115,34 @@ const storiesReducer = (state, action) => {
 
 
 const useSemiPersistentState = (key, initialState) => {
+  const isMounted = React.useRef(false);
+
   const [value, setValue] = React.useState(
     localStorage.getItem(key) || initialState
   );
 
   React.useEffect(() => {
-    localStorage.setItem(key, value);
+    if (!isMounted.current) {
+      isMounted.current = true;
+    } else {
+      console.log('A');
+      localStorage.setItem(key, value);
+    }
   }, [value, key]);
 
   return [value, setValue];
 };
 
 const API_ENDPOINT = 'https://hn.algolia.com/api/v1/search?query=';
+
+const getSumComments = stories => {
+  console.log('C');
+
+  return stories.data.reduce(
+    (result, value) => result + value.num_comments,
+    0
+  );
+};
 
 const App = () => {
   const [searchTerm, setSearchTerm] = useSemiPersistentState('search', 'React');
@@ -171,16 +185,20 @@ const App = () => {
     event.preventDefault();
   };
 
-  const handleRemoveStory = item => {
+  const handleRemoveStory = React.useCallback(item => {
     dispatchStories({
       type: "REMOVE_STORY",
       payload: item,
     });
-  };
+  }, []);
+
+  console.log('B: App');
+
+  const sumComments = React.useMemo(() => getSumComments(stories), [stories,]);
 
   return (
       <StyledContainer>
-        <StyledHeadlinePrimary>My Hacker Stories</StyledHeadlinePrimary>
+        <StyledHeadlinePrimary>My Hacker Stories with {sumComments} comments.</StyledHeadlinePrimary>
 
         <SearchForm
           searchTerm={searchTerm}
@@ -196,7 +214,6 @@ const App = () => {
           <List list={stories.data} onRemoveItem={handleRemoveStory} />
         )}
 
-        {/*list.map((item) => <div key={item.objectID}>{item.title}</div>)*/}
         <div>
           Icons made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a>
         </div>
@@ -245,10 +262,13 @@ const InputWithLabel = ({ id, type="text", value, isFocused, onInputChange, chil
 }
 
 
-const List = ({ list, onRemoveItem }) =>
+const List = React.memo(
+  ({ list, onRemoveItem }) =>
+  console.log('B: List') ||
   list.map(item => 
     <Item key={item.objectID} item={item} onRemoveItem={onRemoveItem} />
-  );
+  )
+);
 
 
 const Item = ({ item, onRemoveItem }) => (
