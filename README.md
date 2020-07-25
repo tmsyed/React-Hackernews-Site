@@ -20,3 +20,4 @@ Features of the App:
 - Memorizing recent searches through state and manage and useReducer hook
 - Advanced features such as pagination and sorting  
 
+Developed by reading through Robin Wieruch's [Road to React](https://www.roadtoreact.com/) book.
